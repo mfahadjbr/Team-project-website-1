@@ -16,17 +16,15 @@
 // ../config/nodemailer.js
 
 import nodemailer from 'nodemailer';
-import dotenv from 'dotenv'; // Import dotenv
-
-dotenv.config(); // <--- ADD THIS LINE to load your .env variables
+import { config } from '../../config.js';
 
 const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST,
-  port: parseInt(process.env.EMAIL_PORT), // <--- It's good practice to parse port to integer
+  host: config.EMAIL_HOST,
+  port: parseInt(config.EMAIL_PORT), // Parse port to integer
   secure: false, // For port 587, use false as it uses STARTTLS
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
+    user: config.EMAIL_USER,
+    pass: config.EMAIL_PASS,
   },
   tls: {
     // This is often important, especially in development, to prevent self-signed cert errors.

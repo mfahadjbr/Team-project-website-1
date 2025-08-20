@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 import Otp from '../models/Otp.js';
 import EmailService from '../services/emailService.js';
+import { config } from '../../config.js';
 import {
   ServerError,
   ValidationErrorResponse,
@@ -14,8 +15,8 @@ import {
 
 // Generate JWT Token
 const generateToken = (userId) => {
-  return jwt.sign({ userId }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN
+  return jwt.sign({ userId }, config.JWT_SECRET, {
+    expiresIn: config.JWT_EXPIRES_IN
   });
 };
 
@@ -278,7 +279,7 @@ const forgotPassword = async (req, res) => {
     // Generate reset token
     const resetToken = jwt.sign(
       { userId: user._id },
-      process.env.JWT_SECRET,
+      config.JWT_SECRET,
       { expiresIn: '1h' }
     );
 
@@ -300,7 +301,7 @@ const resetPassword = async (req, res) => {
     const { password } = req.body;
 
     // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, config.JWT_SECRET);
 
     // Update password
     const user = await User.findById(decoded.userId);

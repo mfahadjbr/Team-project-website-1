@@ -14,6 +14,11 @@ import {
 // @access  Private
 const createProject = async (req, res) => {
   try {
+    console.log('=== PROJECT CREATION START ===');
+    console.log('Request body:', req.body);
+    console.log('Request files:', req.files);
+    console.log('User ID:', req.user._id);
+
     const {
       title,
       summary,
@@ -22,35 +27,100 @@ const createProject = async (req, res) => {
       link
     } = req.body;
 
-    // Process files
-    const thumbnailPath = req.files?.thumbnail?.[0]?.path;
-    const imagePaths = req.files?.images?.map(file => file.path) || [];
+    // Process files - handle cases where files might not be uploaded
+    let thumbnailPath = null;
+    let imagePaths = [];
 
+    if (req.files && req.files.thumbnail && req.files.thumbnail[0]) {
+      thumbnailPath = req.files.thumbnail[0].path;
+      console.log('Thumbnail uploaded successfully:', thumbnailPath);
+    } else {
+      console.log('No thumbnail file uploaded');
+    }
 
-  const user = await User.findById(req.user._id).select('isProfileComplete');
+    if (req.files && req.files.images && req.files.images.length > 0) {
+      imagePaths = req.files.images.map(file => file.path);
+      console.log('Images uploaded successfully:', imagePaths);
+    } else {
+      console.log('No additional images uploaded');
+    }
+
+    const user = await User.findById(req.user._id).select('isProfileComplete');
     if (!user || !user.isProfileComplete) {
+      console.log('User profile incomplete or user not found');
       return ClientError(res, 'Please complete your profile before creating a project');
     }
 
     console.log('User profile complete:', user.isProfileComplete);
-const thisUser=await User.findById(req.user._id)
-console.log('Current user:', thisUser);
+    const thisUser = await User.findById(req.user._id);
+    console.log('Current user:', thisUser);
 
-    // Create project
-    const project = await Project.create({
+    // Parse skills if it's a JSON string, otherwise split by comma
+    let skillsArray = [];
+    if (skills) {
+      console.log('Create project - Raw skills input:', skills);
+      try {
+        // Try to parse as JSON first (frontend sends it as JSON string)
+        const parsedSkills = JSON.parse(skills);
+        console.log('Create project - Parsed skills:', parsedSkills);
+        
+        // Ensure we have an array of strings
+        if (Array.isArray(parsedSkills)) {
+          skillsArray = parsedSkills.map(skill => String(skill).trim()).filter(skill => skill);
+        } else if (typeof parsedSkills === 'string') {
+          // If it's a string, split by comma
+          skillsArray = parsedSkills.split(',').map(skill => skill.trim()).filter(skill => skill);
+        } else {
+          // If it's neither array nor string, convert to string and split
+          skillsArray = String(parsedSkills).split(',').map(skill => skill.trim()).filter(skill => skill);
+        }
+        
+        console.log('Create project - Final skills array:', skillsArray);
+      } catch (e) {
+        // If not JSON, split by comma (fallback)
+        skillsArray = skills.split(',').map(skill => skill.trim()).filter(skill => skill);
+        console.log('Create project - Skills split by comma:', skillsArray);
+      }
+    }
+
+    // Create project data object
+    const projectData = {
       userId: req.user._id,
       title,
       summary,
-      skills: skills.split(',').map(skill => skill.trim()),
+      skills: skillsArray,
       description,
       link,
       thumbnail: thumbnailPath,
       images: imagePaths
-    });
+    };
 
+    console.log('Project data to create:', projectData);
+
+    // Validate required fields
+    if (!title || !summary || !description) {
+      console.log('Missing required fields');
+      return ClientError(res, 'Title, summary, and description are required');
+    }
+
+    // Create project
+    const project = await Project.create(projectData);
+    console.log('Project created successfully:', project);
+    console.log('Project skills after creation:', project.skills);
+
+    console.log('=== PROJECT CREATION END ===');
     return CreatedResponse(res, 'Project created successfully', project);
   } catch (error) {
-    console.log(error)
+    console.error('=== PROJECT CREATION ERROR ===');
+    console.error('Error details:', error);
+    console.error('Error stack:', error.stack);
+    
+    // Check if it's a validation error
+    if (error.name === 'ValidationError') {
+      const validationErrors = Object.values(error.errors).map(err => err.message);
+      return ClientError(res, `Validation error: ${validationErrors.join(', ')}`);
+    }
+    
     return ServerError(res, 'Server error during project creation');
   }
 };
@@ -60,11 +130,24 @@ console.log('Current user:', thisUser);
 // @access  Private
 const getMyProjects = async (req, res) => {
   try {
+    console.log('=== FETCHING MY PROJECTS ===');
+    console.log('User ID:', req.user._id);
+    
     const projects = await Project.find({ userId: req.user._id })
       .sort({ createdAt: -1 });
 
+    console.log('Found projects:', projects);
+    console.log('Project count:', projects.length);
+    
+    // Debug skills data for each project
+    projects.forEach((project, index) => {
+      console.log(`Project ${index + 1} skills:`, project.skills);
+    });
+
     return SuccessResponse(res, 'Projects retrieved successfully', { projects, count: projects.length });
   } catch (error) {
+    console.error('=== ERROR FETCHING PROJECTS ===');
+    console.error('Error details:', error);
     return ServerError(res, 'Server error while fetching projects');
   }
 };
@@ -94,13 +177,40 @@ const updateProject = async (req, res) => {
       return AuthError(res, 'Not authorized to update this project');
     }
 
+    // Parse skills if it's a JSON string, otherwise split by comma
+    let skillsArray = project.skills; // Keep existing skills by default
+    if (skills) {
+      console.log('Update project - Raw skills input:', skills);
+      try {
+        // Try to parse as JSON first (frontend sends it as JSON string)
+        const parsedSkills = JSON.parse(skills);
+        console.log('Update project - Parsed skills:', parsedSkills);
+        
+        // Ensure we have an array of strings
+        if (Array.isArray(parsedSkills)) {
+          skillsArray = parsedSkills.map(skill => String(skill).trim()).filter(skill => skill);
+        } else if (typeof parsedSkills === 'string') {
+          // If it's a string, split by comma
+          skillsArray = parsedSkills.split(',').map(skill => skill.trim()).filter(skill => skill);
+        } else {
+          // If it's neither array nor string, convert to string and split
+          skillsArray = String(parsedSkills).split(',').map(skill => skill.trim()).filter(skill => skill);
+        }
+        console.log('Update project - Final skills array:', skillsArray);
+      } catch (e) {
+        // If not JSON, split by comma (fallback)
+        skillsArray = skills.split(',').map(skill => skill.trim()).filter(skill => skill);
+        console.log('Update project - Skills split by comma:', skillsArray);
+      }
+    }
+
     // Update project
     const updatedProject = await Project.findByIdAndUpdate(
       id,
       {
         title,
         summary,
-        skills: skills ? skills.split(',').map(skill => skill.trim()) : project.skills,
+        skills: skillsArray,
         description,
         link,
         ...(req.files?.thumbnail?.[0]?.path && { thumbnail: req.files.thumbnail[0].path }),

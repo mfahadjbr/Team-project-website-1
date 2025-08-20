@@ -33,6 +33,12 @@ const createProfile = async (req, res) => {
     }
 
     // Validate required fields
+    if (!profession) {
+      return ClientError(res, 'Profession is required');
+    }
+    if (!description) {
+      return ClientError(res, 'Description is required');
+    }
     if (!linkedin) {
       return ClientError(res, 'LinkedIn profile is required');
     }
@@ -41,17 +47,20 @@ const createProfile = async (req, res) => {
     const profile = await Profile.create({
       userId: req.user._id,
       profession,
-      skills: skills.split(',').map(skill => skill.trim()),
+      skills: skills ? skills.split(',').map(skill => skill.trim()).filter(skill => skill) : [],
       description,
-      yearsOfExperience,
+      yearsOfExperience: yearsOfExperience || 0,
       linkedin,
-      github,
-      fiverr,
-      whatsapp,
+      github: github || '',
+      fiverr: fiverr || '',
+      whatsapp: whatsapp || '',
       certificates: req.files?.certificates?.map(file => file.path) || [],
       profileImage: req.files?.profileImage?.[0]?.path || null
     });
-await User.findByIdAndUpdate(req.user._id, { isProfileComplete: true }, { new: true });
+
+    // Update user to mark profile as complete
+    await User.findByIdAndUpdate(req.user._id, { isProfileComplete: true }, { new: true });
+    
     return CreatedResponse(res, 'Profile created successfully', profile);
   } catch (error) {
     // Handle specific database errors
@@ -73,7 +82,13 @@ const getMyProfile = async (req, res) => {
       .populate('userId', 'fullName email');
 
     if (!profile) {
-      return ResourceNotFound(res, 'Profile');
+      // Return a specific response indicating profile doesn't exist
+      return res.status(404).json({
+        status: false,
+        message: 'Profile not found!',
+        data: null,
+        needsProfile: true
+      });
     }
 
     return SuccessResponse(res, 'Profile retrieved successfully', profile);
@@ -128,7 +143,7 @@ const updateProfile = async (req, res) => {
         fiverr,
         whatsapp,
         ...(req.files?.certificates && { certificates: req.files.certificates.map(file => file.path) }),
-        ...(req.file?.path && { profileImage: req.file.path })
+        ...(req.files?.profileImage && req.files.profileImage[0]?.path && { profileImage: req.files.profileImage[0].path })
       },
       { new: true, runValidators: true }
     );

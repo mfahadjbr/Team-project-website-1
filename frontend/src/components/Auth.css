@@ -1,0 +1,150 @@
+.auth-page {
+  min-height: calc(100vh - 80px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: linear-gradient(135deg, var(--light-gray) 0%, var(--white) 100%);
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.auth-header h1 {
+  color: var(--primary-green);
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.auth-header p {
+  color: var(--text-light);
+  font-size: 1rem;
+}
+
+.auth-form {
+  margin-bottom: 2rem;
+}
+
+.input-icon {
+  margin-right: 0.5rem;
+  color: var(--primary-green);
+}
+
+.password-input-container {
+  position: relative;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-light);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: color 0.3s ease;
+}
+
+.password-toggle:hover {
+  color: var(--primary-green);
+}
+
+.otp-input {
+  text-align: center;
+  font-size: 1.2rem;
+  letter-spacing: 2px;
+  font-weight: 600;
+}
+
+.form-help {
+  display: block;
+  margin-top: 0.5rem;
+  color: var(--text-light);
+  font-size: 0.875rem;
+}
+
+.auth-footer {
+  text-align: center;
+  border-top: 1px solid var(--medium-gray);
+  padding-top: 1.5rem;
+}
+
+.auth-footer p {
+  margin-bottom: 0.75rem;
+  color: var(--text-light);
+}
+
+.auth-link {
+  color: var(--primary-green);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.auth-link:hover {
+  color: var(--dark-green);
+  text-decoration: underline;
+}
+
+.auth-link-btn {
+  background: none;
+  border: none;
+  color: var(--primary-green);
+  text-decoration: none;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+  transition: color 0.3s ease;
+}
+
+.auth-link-btn:hover {
+  color: var(--dark-green);
+  text-decoration: underline;
+}
+
+.resend-section {
+  margin-bottom: 1.5rem;
+}
+
+.resend-section p {
+  margin-bottom: 0.75rem;
+}
+
+/* Small spinner for buttons */
+.spinner-small {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--white);
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-right: 0.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .auth-page {
+    padding: 15px;
+  }
+  
+  .auth-header h1 {
+    font-size: 1.75rem;
+  }
+  
+  .auth-header p {
+    font-size: 0.9rem;
+  }
+  
+  .otp-input {
+    font-size: 1rem;
+    letter-spacing: 1px;
+  }
+}

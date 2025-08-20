@@ -10,6 +10,7 @@ import {
 import { authMiddleware, roleMiddleware } from '../middlewares/auth.js';
 import { projectUploadWithErrorHandling } from '../middlewares/upload.js';
 import cloudinary from '../config/cloudinary.js';
+import Project from '../models/Project.js'; // Added import for Project model
 
 const router = express.Router();
 
@@ -387,6 +388,104 @@ router.get('/test-cloudinary', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Project Cloudinary test failed',
+      error: error.message
+    });
+  }
+});
+
+/**
+ * @swagger
+ * /api/v1/project/test-create:
+ *   post:
+ *     summary: Test project creation without file uploads
+ *     description: Simple test endpoint to verify project creation works without files
+ *     tags: [Projects]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - title
+ *               - summary
+ *               - description
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 example: "Test Project"
+ *               summary:
+ *                 type: string
+ *                 example: "A test project for debugging"
+ *               description:
+ *                 type: string
+ *                 example: "This is a test project to verify the creation flow works"
+ *               skills:
+ *                 type: string
+ *                 example: "React, Node.js"
+ *               link:
+ *                 type: string
+ *                 example: "https://github.com/test/project"
+ *     responses:
+ *       201:
+ *         description: Test project created successfully
+ *       400:
+ *         description: Bad request
+ *       401:
+ *         description: Unauthorized
+ */
+router.post('/test-create', authMiddleware, async (req, res) => {
+  try {
+    console.log('=== TEST PROJECT CREATION ===');
+    console.log('Request body:', req.body);
+    console.log('User ID:', req.user._id);
+
+    const { title, summary, description, skills, link } = req.body;
+
+    // Validate required fields
+    if (!title || !summary || !description) {
+      return res.status(400).json({
+        status: false,
+        message: 'Title, summary, and description are required'
+      });
+    }
+
+    // Parse skills
+    let skillsArray = [];
+    if (skills) {
+      try {
+        skillsArray = JSON.parse(skills);
+      } catch (e) {
+        skillsArray = skills.split(',').map(skill => skill.trim());
+      }
+    }
+
+    // Create test project without files
+    const project = await Project.create({
+      userId: req.user._id,
+      title,
+      summary,
+      description,
+      skills: skillsArray,
+      link,
+      thumbnail: 'test-thumbnail-url', // Placeholder
+      images: []
+    });
+
+    console.log('Test project created:', project);
+
+    res.status(201).json({
+      status: true,
+      message: 'Test project created successfully',
+      project
+    });
+  } catch (error) {
+    console.error('Test project creation error:', error);
+    res.status(500).json({
+      status: false,
+      message: 'Test project creation failed',
       error: error.message
     });
   }

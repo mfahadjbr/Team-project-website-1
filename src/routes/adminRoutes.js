@@ -97,31 +97,50 @@ const router = express.Router();
 
 router.get('/users',authMiddleware, roleMiddleware(['admin']), getAllUsers);
 
+router.get('/profiles', authMiddleware, roleMiddleware(['admin']), async (req, res) => {
+  try {
+    const profiles = await Profile.find().populate('user', 'fullName email');
+    return res.json({
+      success: true,
+      data: profiles
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to fetch profiles'
+    });
+  }
+});
 
+router.get('/projects', authMiddleware, roleMiddleware(['admin']), async (req, res) => {
+  try {
+    const projects = await Project.find().populate('user', 'fullName email');
+    return res.json({
+      success: true,
+      data: projects
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to fetch projects'
+    });
+  }
+});
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+router.get('/courses', authMiddleware, roleMiddleware(['admin']), async (req, res) => {
+  try {
+    // For now, return empty array since courses model doesn't exist yet
+    return res.json({
+      success: true,
+      data: []
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to fetch courses'
+    });
+  }
+});
 
 router.put('/unblock/:userId', unblockUser);
 router.delete('/delete-user/:id', deleteUser);

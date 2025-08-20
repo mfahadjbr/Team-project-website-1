@@ -21,11 +21,10 @@ export const config = {
   JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || '7d',
   
   // Cloudinary Configuration
-  CLOUDINARY_URL: process.env.CLOUDINARY_URL || 'cloudinary://494861241695638:4PXIVQ5y4rvrx2caFGRX_ydtkIS8@dhvk1yovx',
+  CLOUDINARY_URL: process.env.CLOUDINARY_URL || 'cloudinary://476963318586982:eTtvDMDxrqaqbiLJ0cuqRFLhT7M@dhvk1yovx',
   CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME || 'dhvk1yovx',
-  CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY || '494861241695638',
-  CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET || '4PXIVQ5y4rvrx2caFGRX_ydtkIS8',
-  
+  CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY || '476963318586982',
+  CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET || 'eTtvDMDxrqaqbiLJ0cuqRFLhT7M',
   // Email Configuration (Gmail)
   EMAIL_HOST: process.env.EMAIL_HOST || 'smtp.gmail.com',
   EMAIL_PORT: process.env.EMAIL_PORT || 587,

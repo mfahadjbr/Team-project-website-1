@@ -38,7 +38,7 @@ const projectSchema = new mongoose.Schema({
   },
   thumbnail: {
     type: String, // Cloudinary URL
-    required: [true, 'Project thumbnail is required']
+    required: false // Temporarily make optional for testing
   },
   images: [{
     type: String // Cloudinary URLs (max 3)

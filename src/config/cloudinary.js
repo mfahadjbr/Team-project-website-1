@@ -1,47 +1,17 @@
-// import cloudinary from 'cloudinary';
-// import dotenv from 'dotenv';
-// // Use hardcoded values from config.js since server doesn't load it
-// const CLOUDINARY_CLOUD_NAME = 'dhvk1yovx';
-// const CLOUDINARY_API_KEY = '999621183725212';
-// const CLOUDINARY_API_SECRET = 'Fo1Vrl5KSUdT_Hcgy8bVQcRHA3g';
-
-// // Validate configuration
-// if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_API_KEY || !CLOUDINARY_API_SECRET) {
-//   throw new Error('Cloudinary configuration is incomplete');
-// }
-
-// cloudinary.v2.config({
-//   cloud_name: CLOUDINARY_CLOUD_NAME,
-//   api_key: CLOUDINARY_API_KEY,
-//   api_secret: CLOUDINARY_API_SECRET,
-// });
-
-// // Test Cloudinary connection (handled silently)
-// cloudinary.v2.api.ping().catch(() => {
-// console.log('Cloudinary connection test failed, but continuing...');
-
-// });
-
-// export default cloudinary.v2;
-
-
 import cloudinary from 'cloudinary';
-import dotenv from 'dotenv'; // This import is here, but currently unused as values are hardcoded.
-dotenv.config(); // Load environment variables if needed in the future
-// Using hardcoded values directly.
-// If you intend to use environment variables in the future,
-// you'd need dotenv.config() here or ensure it's loaded globally before this file executes.
-const CLOUDINARY_CLOUD_NAME = 'dhvk1yovx';
-const CLOUDINARY_API_KEY = '999621183725212';
-const CLOUDINARY_API_SECRET = 'Fo1Vrl5KSUdT_Hcgy8bVQcRHA3g';
+import { config } from '../../config.js';
 
-// Add logging for environment variable loading status (if you switch to .env later)
-// console.log('Cloudinary config loaded - CLOUDINARY_CLOUD_NAME:', process.env.CLOUDINARY_CLOUD_NAME);
-// console.log('Cloudinary config loaded - CLOUDINARY_API_KEY:', process.env.CLOUDINARY_API_KEY ? '******' : 'NOT SET');
-// console.log('Cloudinary config loaded - CLOUDINARY_API_SECRET:', process.env.CLOUDINARY_API_SECRET ? '******' : 'NOT SET');
+// Use values from config.js
+const CLOUDINARY_CLOUD_NAME = config.CLOUDINARY_CLOUD_NAME;
+const CLOUDINARY_API_KEY = config.CLOUDINARY_API_KEY;
+const CLOUDINARY_API_SECRET = config.CLOUDINARY_API_SECRET;
 
+console.log('Cloudinary config from config.js:');
+console.log('Cloud Name:', CLOUDINARY_CLOUD_NAME);
+console.log('API Key:', CLOUDINARY_API_KEY);
+console.log('API Secret:', CLOUDINARY_API_SECRET ? '******' : 'NOT SET');
 
-// Validate configuration and add more specific logging
+// Validate configuration
 if (!CLOUDINARY_CLOUD_NAME) {
   console.error('Cloudinary Configuration Error: CLOUDINARY_CLOUD_NAME is missing.');
   throw new Error('Cloudinary configuration is incomplete: Cloud Name missing.');
@@ -64,7 +34,6 @@ cloudinary.v2.config({
   secure: true // It's good practice to ensure secure (HTTPS) connections
 });
 console.log('Cloudinary configured with provided credentials.');
-
 
 // Test Cloudinary connection with explicit success/failure logs
 cloudinary.v2.api.ping()

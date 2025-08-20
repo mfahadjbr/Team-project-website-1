@@ -302,7 +302,7 @@ router.post('/add', authMiddleware, profileUploadWithErrorHandling, async (req, 
  *                   type: string
  *                   example: Profile not found
  */
-router.get('/me', authMiddleware, getMyProfile);
+router.get('/me',  authMiddleware, getMyProfile);
 
 /**
  * @swagger
@@ -498,7 +498,7 @@ router.get('/me', authMiddleware, getMyProfile);
  *                   type: string
  *                   example: Internal server error
  */
-router.put('/update/:id', authMiddleware, profileImageUpload, certificateUpload, updateProfile);
+router.put('/update/:id', authMiddleware, profileUploadWithErrorHandling, updateProfile);
 
 /**
  * @swagger
